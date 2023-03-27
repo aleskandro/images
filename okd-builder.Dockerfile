@@ -26,7 +26,10 @@ RUN set -x; mkdir -p /go/src/ \
         systemd-devel gpgme-devel libassuan-devel \
     && yum clean all \
     # goversioninfo is not shipped as RPM in Stream9, so install it with go instead
-    && GOFLAGS='' go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
+    && GOFLAGS='' go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest \
+    && echo -e '#!/bin/bash\nexec "$@"' > /usr/bin/container-entrypoint && chmod +x /usr/bin/container-entrypoint
+
+WORKDIR /src
 
 LABEL \
         io.k8s.description="This is a golang builder image for building OKD components." \
