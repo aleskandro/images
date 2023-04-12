@@ -10,7 +10,11 @@ ENV container=oci \
     GOFLAGS='-mod=vendor' \
     GOPATH=${GOPATH:-/go} \
     GOMAXPROCS=8 \
-    PATH=/go/bin:${PATH}
+    NVM_DIR=/usr/local/nvm \
+    NODE_VERSION=14.21.3
+
+ENV NODE_PATH=${NVM_DIR}/v${NODE_VERSION}/lib/node_modules \
+    PATH=/go/bin:/opt/app-root/src/node_modules/.bin:${NVM_DIR}/versions/node/v${NODE_VERSION}/bin:${PATH}
 
 RUN set -x; mkdir -p /go/src/ \
     && yum install -y yum-utils \
@@ -22,14 +26,19 @@ RUN set -x; mkdir -p /go/src/ \
     && yum upgrade --refresh -y \
     && yum install -y \
         bc file findutils gpgme git hostname lsof make socat tar tree util-linux wget which zip \
-        gcc-toolset-12 go-toolset nodejs npm openssl openssl-devel \
+        gcc-toolset-12 go-toolset openssl openssl-devel \
         systemd-devel gpgme-devel libassuan-devel \
     && yum clean all \
     # goversioninfo is not shipped as RPM in Stream9, so install it with go instead
     && GOFLAGS='' go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest \
     && echo -e '#!/bin/bash\nexec "$@"' > /usr/bin/container-entrypoint && chmod +x /usr/bin/container-entrypoint
 
-WORKDIR /src
+
+RUN mkdir -p "${NVM_DIR}" && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash \
+   && source $NVM_DIR/nvm.sh \
+   && nvm install $NODE_VERSION
+
+WORKDIR /opt/app-root/src
 
 LABEL \
         io.k8s.description="This is a golang builder image for building OKD components." \
