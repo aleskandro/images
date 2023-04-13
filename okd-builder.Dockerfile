@@ -33,7 +33,7 @@ RUN set -x; mkdir -p /go/src/ \
     && yum clean all \
     # goversioninfo is not shipped as RPM in Stream9, so install it with go instead
     && GOFLAGS='' go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest \
-    && echo -e '#!/bin/bash\nexec "$@"' > /usr/bin/container-entrypoint && chmod +x /usr/bin/container-entrypoint
+    && chmod +x /usr/bin/*
 
 
 RUN mkdir -p "${NVM_DIR}" && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash \
