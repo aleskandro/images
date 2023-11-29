@@ -6,3 +6,4 @@ repo_gpgcheck=0
 metadata_expire=6h
 countme=1
 enabled=1
+includepkgs=openshift-clients*
